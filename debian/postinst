@@ -13,6 +13,11 @@
 #        must not become unconfigurable because apt-mark is busy.
 set -eu
 
+# debhelper inserts its generated snippets here (systemd enable/reload, dpkg-maint-script
+# helpers). It must sit before this script's own exits, otherwise they never run - that is
+# exactly how every KubeOS package ended up with units debhelper never enabled.
+#DEBHELPER#
+
 log() { echo "kubeos-kubernetes: $*"; }
 
 if [ "${1:-}" = configure ]; then
