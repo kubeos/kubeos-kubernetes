@@ -15,7 +15,7 @@
 #        harmless: the archive publisher replaces a package's own stanza.
 set -eu
 
-HERE=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+HERE=$(unset CDPATH && cd -- "$(dirname -- "$0")/.." && pwd)
 UPSTREAM=${KUBEOS_K8S_UPSTREAM:-https://pkgs.k8s.io/core:/stable:/v1.37/deb}
 PUBLISHER=${KUBEOS_PUBLISHER:-/root/pkgs/archive-publish.sh}
 DRY_RUN=${KUBEOS_MIRROR_DRY_RUN:-0}
