@@ -1,0 +1,26 @@
+Source: kubeos-kubernetes
+Section: admin
+Priority: optional
+Maintainer: KubeOS <mail@kubeos.in>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+Homepage: https://kubeos.in/
+
+Package: kubeos-kubernetes
+Architecture: all
+Depends: ${misc:Depends}, kubelet (= 1.37.2-1.1), kubeadm (= 1.37.2-1.1), kubectl (= 1.37.2-1.1), kubernetes-cni (= 1.9.1-1.1)
+Description: KubeOS: the pinned Kubernetes version a node runs
+ Names the exact Kubernetes release a KubeOS node uses, and is what makes "which
+ Kubernetes does this KubeOS run?" answerable with one command:
+ .
+     dpkg-query -W kubeos-kubernetes
+ .
+ kubelet, kubeadm, kubectl and kubernetes-cni are the upstream debs, copied into the
+ KubeOS archive byte for byte. They are not rebuilt and not re-versioned, so they behave
+ exactly like the upstream release - but they are only reachable from repo.kubeos.in, so
+ `apt upgrade` can never move a node to a Kubernetes version KubeOS has not vetted. The
+ upstream pkgs.k8s.io repository is not configured on a KubeOS node.
+ .
+ Upgrading a cluster is therefore a KubeOS decision, taken by publishing a new version of
+ this package together with the matching debs (see PINNED and bin/mirror.sh).

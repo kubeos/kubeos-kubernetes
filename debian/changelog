@@ -1,0 +1,21 @@
+kubeos-kubernetes (1.37.2-1kubeos2) trixie; urgency=medium
+
+  * postinst: report a hold it cannot clear instead of pretending to clear it.
+    apt-mark needs the dpkg lock that apt itself holds while a postinst runs, so
+    releasing the old ISO's `apt-mark hold` from here always failed silently; the
+    node kept a hold that would block KubeOS's own published updates. It now prints
+    the command to run.
+
+ -- KubeOS <mail@kubeos.in>  Thu, 19 Nov 2026 23:35:00 +0530
+
+kubeos-kubernetes (1.37.2-1kubeos1) trixie; urgency=medium
+
+  * Initial packaging: names the Kubernetes release a KubeOS node runs.
+  * Ships nothing itself - it pins, with `Depends: =`, the four upstream packages
+    (kubelet, kubeadm, kubectl, kubernetes-cni) that the KubeOS archive mirrors
+    byte for byte from pkgs.k8s.io, so `apt upgrade` can never move Kubernetes past
+    what KubeOS has vetted.
+  * postinst drops the upstream pkgs.k8s.io sources line a pre-package node still
+    has, and releases the `apt-mark hold` the old ISO applied.
+
+ -- KubeOS <mail@kubeos.in>  Thu, 19 Nov 2026 23:25:00 +0530

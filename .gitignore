@@ -1,0 +1,11 @@
+# Build output: produced by bin/build-deb.sh and the archive publisher, never committed.
+*.deb
+*.dsc
+*.tar.xz
+*.buildinfo
+*.changes
+debian/.debhelper/
+debian/debhelper-build-stamp
+debian/files
+debian/*.substvars
+debian/kubeos-kubernetes/

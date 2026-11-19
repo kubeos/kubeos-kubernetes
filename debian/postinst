@@ -1,0 +1,46 @@
+#!/bin/sh
+# Runs after kubeos-kubernetes is configured (i.e. after dpkg has the pinned Kubernetes).
+#
+# WHEN   on install and on every upgrade of kubeos-kubernetes.
+# WHY    Two leftovers of the pre-package world must not survive, or the pin is a lie:
+#        1. an installed node kept /etc/apt/sources.list.d/kubernetes.list, the upstream
+#           pkgs.k8s.io feed, so apt still saw every new Kubernetes release and would
+#           upgrade past what KubeOS ships;
+#        2. the ISO held kubelet/kubeadm/kubectl with `apt-mark hold` (hook 9040), which
+#           would block KubeOS's *own* published update just as well.
+#        The archive is the pin now, so neither is needed.
+# SAFE   Only removes a file no package owns, only if it exists, and never fails: a node
+#        must not become unconfigurable because apt-mark is busy.
+set -eu
+
+log() { echo "kubeos-kubernetes: $*"; }
+
+if [ "${1:-}" = configure ]; then
+    removed=0
+    for f in /etc/apt/sources.list.d/kubernetes.list \
+             /etc/apt/sources.list.d/kubernetes.list.save; do
+        [ -e "$f" ] || continue
+        if dpkg -S "$f" >/dev/null 2>&1; then
+            log "$f belongs to a package, leaving it alone"
+            continue
+        fi
+        if rm -f "$f"; then
+            removed=1
+            log "removed the upstream Kubernetes source $f"
+        fi
+    done
+    if [ "$removed" = 1 ]; then
+        log "Kubernetes now comes from repo.kubeos.in only; run 'apt update' to refresh"
+    fi
+    # A hold from the old ISO would block KubeOS's own updates; the pin is the archive now.
+    # This can only succeed when dpkg runs without apt in front of it: during an apt
+    # transaction apt holds the lock that apt-mark needs, so the call fails and the holds
+    # stay. Saying so is the whole point - a silent no-op leaves a node pinned to a
+    # version nothing will ever upgrade.
+    if ! apt-mark unhold kubelet kubeadm kubectl >/dev/null 2>&1; then
+        log "kubelet/kubeadm/kubectl are still held (apt holds the lock during this upgrade)"
+        log "run: apt-mark unhold kubelet kubeadm kubectl"
+    fi
+fi
+
+exit 0

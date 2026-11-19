@@ -1,0 +1,22 @@
+# The Kubernetes version a KubeOS node runs, and the exact files that carry it.
+#
+# FORMAT: <binary package> <version> <sha256 of the amd64 .deb>
+#
+# These are the upstream debs from
+#   https://pkgs.k8s.io/core:/stable:/v1.37/deb/amd64/
+# copied into the KubeOS archive BYTE FOR BYTE - not rebuilt, not re-versioned (user
+# decision 2026-11-19). KubeOS therefore controls when Kubernetes moves: `apt upgrade`
+# on a node can only reach a version listed here, because the upstream repository is not
+# configured on a KubeOS node at all.
+#
+# To move Kubernetes: edit the upstream line in bin/mirror.sh, update this file with the
+# new versions and hashes from the upstream Packages index, bump debian/changelog, build,
+# publish the metapackage, then run bin/mirror.sh. Nothing else changes.
+kubelet        1.37.2-1.1  f95d0b572a24563bb6e2a1a1f0e84a8a30a24e11c95068b2e81c294a0e1bee11
+kubeadm        1.37.2-1.1  d1674bffcf80b36531375b35cf68d0dc23453a373c1b4537d78b6960732bc699
+kubectl        1.37.2-1.1  e95d73aaf1da438cc8b287545b128fbe5e6a9f3723ecaa25eac1b42b8fe542ab
+kubernetes-cni 1.9.1-1.1   4cd72d8cef4499d3dc410874287b40e8b4241e0772938c5820cbee37986c1d93
+# Not a dependency of anything KubeOS installs: the debugging tool that the package lists
+# promise is "one apt install away". Mirrored so that promise survives the removal of the
+# upstream feed.
+cri-tools      1.37.0-1.1  a8eeede0deadc3d9e8f72859732441bfc86fbe60688926ef5410f01338927b71
